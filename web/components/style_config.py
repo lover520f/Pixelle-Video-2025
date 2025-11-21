@@ -15,6 +15,7 @@ Style configuration components for web UI (middle column)
 """
 
 import os
+import base64
 from pathlib import Path
 
 import streamlit as st
@@ -23,6 +24,28 @@ from loguru import logger
 from web.i18n import tr, get_language
 from web.utils.async_helpers import run_async
 from pixelle_video.config import config_manager
+
+
+def _save_uploaded_file_to_temp(uploaded_file, file_type: str) -> str:
+    """
+    Save uploaded file to temp directory with unique name to avoid conflicts
+    
+    Args:
+        uploaded_file: Streamlit UploadedFile object
+        file_type: Type of file (e.g., "ref_audio", "ref_image")
+    
+    Returns:
+        Path to saved file as string
+    """
+    import uuid
+    temp_dir = Path("temp")
+    temp_dir.mkdir(exist_ok=True)
+    unique_id = uuid.uuid4().hex[:8]
+    file_ext = Path(uploaded_file.name).suffix
+    temp_path = temp_dir / f"{file_type}_{unique_id}{file_ext}"
+    with open(temp_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    return str(temp_path)
 
 
 def render_style_config(pixelle_video):
@@ -158,18 +181,14 @@ def render_style_config(pixelle_video):
                 key="ref_audio_upload"
             )
             
-            # Save uploaded ref_audio to temp file if provided
+            # Save uploaded ref_audio temporarily (will be moved to task folder later)
             ref_audio_path = None
             if ref_audio_file is not None:
                 # Audio preview player (directly play uploaded file)
                 st.audio(ref_audio_file)
                 
-                # Save to temp directory
-                temp_dir = Path("temp")
-                temp_dir.mkdir(exist_ok=True)
-                ref_audio_path = temp_dir / f"ref_audio_{ref_audio_file.name}"
-                with open(ref_audio_path, "wb") as f:
-                    f.write(ref_audio_file.getbuffer())
+                # Save to temp directory with unique name
+                ref_audio_path = _save_uploaded_file_to_temp(ref_audio_file, "ref_audio")
             
             # Variables for video generation
             selected_voice = None
@@ -644,6 +663,27 @@ def render_style_config(pixelle_video):
                 label_visibility="visible",
                 help=tr("style.prompt_prefix_help")
             )
+            
+            # Reference image upload (optional, for character consistency)
+            ref_image_col1, ref_image_col2 = st.columns(2)
+            
+            with ref_image_col1:
+                ref_image_file = st.file_uploader(
+                    tr("style.ref_image"),
+                    type=["jpg", "jpeg", "png", "webp"],
+                    help=tr("style.ref_image_help"),
+                    key="ref_image_upload"
+                )
+            
+            # Save uploaded ref_image temporarily (will be moved to task folder later)
+            ref_image_path = None
+            if ref_image_file is not None:
+                # Save to temp directory with unique name
+                ref_image_path = _save_uploaded_file_to_temp(ref_image_file, "ref_image")
+                
+                # Show preview in the right column
+                with ref_image_col2:
+                    st.image(ref_image_file, caption=tr("style.ref_image_preview"), use_container_width=True)
         
             # Media preview expander
             preview_title = tr("style.video_preview_title") if template_media_type == "video" else tr("style.preview_title")
@@ -675,13 +715,19 @@ def render_style_config(pixelle_video):
                             final_prompt = build_image_prompt(test_prompt, prompt_prefix)
                         
                             # Generate preview media (use user-specified size and media type)
-                            media_result = run_async(pixelle_video.media(
-                                prompt=final_prompt,
-                                workflow=workflow_key,
-                                media_type=template_media_type,
-                                width=int(media_width),
-                                height=int(media_height)
-                            ))
+                            media_params = {
+                                "prompt": final_prompt,
+                                "workflow": workflow_key,
+                                "media_type": template_media_type,
+                                "width": int(media_width),
+                                "height": int(media_height)
+                            }
+                            
+                            # Add ref_image if provided
+                            if ref_image_path:
+                                media_params["ref_image"] = str(ref_image_path)
+                            
+                            media_result = run_async(pixelle_video.media(**media_params))
                             preview_media_path = media_result.url
                         
                             # Display preview (support both URL and local path)
@@ -731,6 +777,7 @@ def render_style_config(pixelle_video):
             # Set default values for later use
             workflow_key = None
             prompt_prefix = ""
+            ref_image_path = None
     
     # Return all style configuration parameters
     return {
@@ -744,5 +791,6 @@ def render_style_config(pixelle_video):
         "media_workflow": workflow_key,
         "prompt_prefix": prompt_prefix if prompt_prefix else "",
         "media_width": media_width,
-        "media_height": media_height
+        "media_height": media_height,
+        "ref_image": str(ref_image_path) if ref_image_path else None
     }

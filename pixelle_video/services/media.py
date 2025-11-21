@@ -125,6 +125,7 @@ class MediaService(ComfyBaseService):
         seed: Optional[int] = None,
         cfg: Optional[float] = None,
         sampler: Optional[str] = None,
+        ref_image: Optional[str] = None,  # Reference image for character consistency
         **params
     ) -> MediaResult:
         """
@@ -147,6 +148,7 @@ class MediaService(ComfyBaseService):
             seed: Random seed
             cfg: CFG scale
             sampler: Sampler name
+            ref_image: Reference image path for character consistency
             **params: Additional workflow parameters
         
         Returns:
@@ -219,6 +221,8 @@ class MediaService(ComfyBaseService):
             workflow_params["cfg"] = cfg
         if sampler is not None:
             workflow_params["sampler"] = sampler
+        if ref_image is not None:
+            workflow_params["ref_image"] = ref_image
         
         # Add any additional parameters
         workflow_params.update(params)

@@ -55,6 +55,7 @@ def render_single_output(pixelle_video, video_params):
     tts_speed = video_params.get("tts_speed")
     tts_workflow_key = video_params.get("tts_workflow")
     ref_audio_path = video_params.get("ref_audio")
+    ref_image_path = video_params.get("ref_image")
     
     frame_template = video_params.get("frame_template")
     custom_values_for_video = video_params.get("template_params", {})
@@ -86,7 +87,10 @@ def render_single_output(pixelle_video, video_params):
             
             # Record start time for generation
             import time
+            import uuid
+            import shutil
             start_time = time.time()
+            
             
             try:
                 # Progress callback to update UI
@@ -148,6 +152,10 @@ def render_single_output(pixelle_video, video_params):
                     video_params["tts_workflow"] = tts_workflow_key
                     if ref_audio_path:
                         video_params["ref_audio"] = str(ref_audio_path)
+                
+                # Add ref_image if provided
+                if ref_image_path:
+                    video_params["ref_image"] = str(ref_image_path)
                 
                 # Add custom template parameters if any
                 if custom_values_for_video:

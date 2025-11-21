@@ -89,6 +89,7 @@ class StandardPipeline(BasePipeline):
         tts_workflow: Optional[str] = None,
         tts_speed: float = 1.2,
         ref_audio: Optional[str] = None,  # Reference audio for voice cloning
+        ref_image: Optional[str] = None,  # Reference image for character consistency
         output_path: Optional[str] = None,
         
         # === LLM Parameters ===
@@ -231,6 +232,35 @@ class StandardPipeline(BasePipeline):
         logger.info(f"📁 Task directory created: {task_dir}")
         logger.info(f"   Task ID: {task_id}")
         
+        # Move ref_audio and ref_image from temp to task directory
+        import shutil
+        from pathlib import Path
+        
+        final_ref_audio = None
+        final_ref_image = None
+        
+        if ref_audio:
+            # Move ref_audio to task directory
+            ref_audio_src = Path(ref_audio)
+            if ref_audio_src.exists():
+                final_ref_audio = Path(task_dir) / f"ref_audio{ref_audio_src.suffix}"
+                shutil.copy2(ref_audio, final_ref_audio)
+                final_ref_audio = str(final_ref_audio)
+                logger.info(f"   Ref audio: {final_ref_audio}")
+            else:
+                logger.warning(f"   Ref audio not found: {ref_audio}")
+        
+        if ref_image:
+            # Move ref_image to task directory
+            ref_image_src = Path(ref_image)
+            if ref_image_src.exists():
+                final_ref_image = Path(task_dir) / f"ref_image{ref_image_src.suffix}"
+                shutil.copy2(ref_image, final_ref_image)
+                final_ref_image = str(final_ref_image)
+                logger.info(f"   Ref image: {final_ref_image}")
+            else:
+                logger.warning(f"   Ref image not found: {ref_image}")
+        
         # Determine final video path
         user_specified_output = None
         if output_path is None:
@@ -240,7 +270,7 @@ class StandardPipeline(BasePipeline):
             output_path = get_task_final_video_path(task_id)
             logger.info(f"   Will copy final video to: {user_specified_output}")
         
-        # Create storyboard config
+        # Create storyboard config (use final paths)
         config = StoryboardConfig(
             task_id=task_id,
             n_storyboard=n_scenes,
@@ -253,7 +283,8 @@ class StandardPipeline(BasePipeline):
             voice_id=final_voice_id,  # Use processed voice_id
             tts_workflow=final_tts_workflow,  # Use processed workflow
             tts_speed=tts_speed,
-            ref_audio=ref_audio,
+            ref_audio=final_ref_audio,  # Use moved path
+            ref_image=final_ref_image,  # Use moved path
             media_width=media_width,
             media_height=media_height,
             media_workflow=media_workflow,
@@ -541,6 +572,7 @@ class StandardPipeline(BasePipeline):
                     "tts_workflow": tts_workflow,
                     "tts_speed": tts_speed,
                     "ref_audio": ref_audio,
+                    "ref_image": ref_image,
                     "media_workflow": media_workflow,
                     "prompt_prefix": prompt_prefix,
                     "frame_template": frame_template,

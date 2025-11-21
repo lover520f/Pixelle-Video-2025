@@ -102,6 +102,10 @@ async def generate_video_sync(
         if request_body.ref_audio:
             video_params["ref_audio"] = request_body.ref_audio
         
+        # Add ref_image if specified
+        if request_body.ref_image:
+            video_params["ref_image"] = request_body.ref_image
+        
         # Legacy voice_id support (deprecated)
         if request_body.voice_id:
             logger.warning("voice_id parameter is deprecated, please use tts_workflow instead")
@@ -202,6 +206,10 @@ async def generate_video_async(
             # Add ref_audio if specified
             if request_body.ref_audio:
                 video_params["ref_audio"] = request_body.ref_audio
+            
+            # Add ref_image if specified
+            if request_body.ref_image:
+                video_params["ref_image"] = request_body.ref_image
             
             # Legacy voice_id support (deprecated)
             if request_body.voice_id:

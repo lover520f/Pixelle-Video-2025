@@ -380,6 +380,7 @@ class PersistenceService:
             "tts_workflow": config.tts_workflow,
             "tts_speed": config.tts_speed,
             "ref_audio": config.ref_audio,
+            "ref_image": config.ref_image,
             "media_width": config.media_width,
             "media_height": config.media_height,
             "media_workflow": config.media_workflow,
@@ -402,6 +403,7 @@ class PersistenceService:
             tts_workflow=data.get("tts_workflow"),
             tts_speed=data.get("tts_speed"),
             ref_audio=data.get("ref_audio"),
+            ref_image=data.get("ref_image"),
             media_width=data.get("media_width", data.get("image_width", 1024)),  # Backward compatibility
             media_height=data.get("media_height", data.get("image_height", 1024)),  # Backward compatibility
             media_workflow=data.get("media_workflow", data.get("image_workflow")),  # Backward compatibility

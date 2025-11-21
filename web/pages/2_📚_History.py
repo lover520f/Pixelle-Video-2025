@@ -293,6 +293,20 @@ def render_task_detail_modal(task_id: str, pixelle_video):
         st.markdown(f"**{tr('history.detail.tts_mode')}:** {input_params.get('tts_inference_mode', 'N/A')}")
         st.markdown(f"**{tr('history.detail.voice')}:** {input_params.get('tts_voice', 'N/A')}")
         
+        # Show ref_audio if exists
+        if storyboard and storyboard.config and storyboard.config.ref_audio:
+            ref_audio_path = storyboard.config.ref_audio
+            if os.path.exists(ref_audio_path):
+                st.markdown(f"**{tr('history.detail.ref_audio')}:**")
+                st.audio(ref_audio_path)
+        
+        # Show ref_image if exists
+        if storyboard and storyboard.config and storyboard.config.ref_image:
+            ref_image_path = storyboard.config.ref_image
+            if os.path.exists(ref_image_path):
+                st.markdown(f"**{tr('history.detail.ref_image')}:**")
+                st.image(ref_image_path, width=200)
+        
         # Input text
         with st.expander(tr("history.detail.text"), expanded=True):
             st.text_area(

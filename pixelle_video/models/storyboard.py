@@ -46,6 +46,9 @@ class StoryboardConfig:
     tts_speed: Optional[float] = None          # TTS speed multiplier (0.5-2.0, 1.0 = normal)
     ref_audio: Optional[str] = None            # Reference audio for voice cloning (ComfyUI mode only)
     
+    # Media generation reference
+    ref_image: Optional[str] = None            # Reference image for character consistency
+    
     # Media workflow
     media_workflow: Optional[str] = None       # Media workflow filename (image or video, None = use default)
     

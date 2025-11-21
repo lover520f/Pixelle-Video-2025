@@ -206,6 +206,10 @@ class FrameProcessor:
             "height": config.media_height
         }
         
+        # Add reference image if provided
+        if config.ref_image:
+            media_params["ref_image"] = config.ref_image
+        
         # For video workflows: pass audio duration as target video duration
         # This ensures video length matches audio length from the source
         if is_video_workflow and frame.duration:

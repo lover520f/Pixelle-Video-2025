@@ -45,6 +45,10 @@ class VideoGenerateRequest(BaseModel):
         None, 
         description="Reference audio path for voice cloning (optional)"
     )
+    ref_image: Optional[str] = Field(
+        None, 
+        description="Reference image path for character consistency (optional)"
+    )
     voice_id: Optional[str] = Field(
         None, 
         description="(Deprecated) TTS voice ID for legacy compatibility"
