@@ -354,6 +354,8 @@
     "pipeline.quick_create.description": "Input an idea, AI completes the entire video for you",
     "pipeline.custom_media.name": "Custom Media",
     "pipeline.custom_media.description": "Use your own photos/videos, AI adds narration and voiceover",
+    "pipeline.sora.name": "Sora Image-to-Video",
+    "pipeline.sora.description": "Enter text and an image URL, then generate a full video via Sora I2V workflows",
     "asset_based.section.assets": "📦 Asset Upload",
     "asset_based.section.video_info": "📝 Video Information",
     "asset_based.section.source": "⚙️ Service Configuration",

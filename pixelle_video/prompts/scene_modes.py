@@ -306,6 +306,37 @@ def list_scene_modes() -> List[SceneMode]:
     return list(SCENE_MODES.values())
 
 
+# ============================================================================
+# Visual style prefixes for media generation (e.g., Sora video prompts)
+# ============================================================================
+
+SCENE_STYLE_PREFIXES: Dict[str, str] = {
+    "marketing": (
+        "clean minimalist style, bright lighting, simple backgrounds, "
+        "focus on presenter or key objects, social-media short video look"
+    ),
+    "advertisement": (
+        "high-contrast commercial style, strong brand colors, dynamic camera angles, "
+        "product close-ups, modern ad cinematic look"
+    ),
+    "storytelling": (
+        "cinematic storytelling style, warm tone, shallow depth of field, "
+        "soft lighting, filmic composition"
+    ),
+    "tutorial": (
+        "clear instructional style, simple compositions, focus on steps and key elements, "
+        "UI overlays or callouts when appropriate"
+    ),
+}
+
+
+def get_scene_style_prefix(key: Optional[str]) -> str:
+    """Get visual style prefix for a given scene mode key."""
+    if not key:
+        return ""
+    return SCENE_STYLE_PREFIXES.get(key, "")
+
+
 def get_scene_mode_prompt(
     key: str,
     topic: str,
@@ -336,4 +367,5 @@ def get_scene_mode_prompt(
         min_words=min_words,
         max_words=max_words
     )
+
 

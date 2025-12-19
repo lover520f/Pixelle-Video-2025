@@ -354,6 +354,8 @@
     "pipeline.quick_create.description": "输入一个想法,AI帮你完成整条视频",
     "pipeline.custom_media.name": "自定义素材",
     "pipeline.custom_media.description": "用你自己的照片/视频,AI帮你配文案和配音",
+    "pipeline.sora.name": "Sora 图生视频",
+    "pipeline.sora.description": "输入文本与图片 URL，使用 Sora 图生视频工作流生成整条视频",
     "asset_based.section.assets": "📦 素材上传",
     "asset_based.section.video_info": "📝 视频信息",
     "asset_based.section.source": "⚙️ 服务配置",
